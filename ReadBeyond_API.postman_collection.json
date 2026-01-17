@@ -1,0 +1,478 @@
+{
+	"info": {
+		"_postman_id": "readbeyond-api-collection",
+		"name": "ReadBeyond API",
+		"description": "Complete API collection for ReadBeyond - OCR and Translation service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"description": "Check server health and OCR service status"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "OCR & Upload",
+			"item": [
+				{
+					"name": "Upload Image with OCR",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "form-data",
+							"form-data": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": []
+								}
+							],
+							"description": "Upload an image and automatically extract text using OCR"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/upload?language=eng&preprocess=true",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"upload"
+							],
+							"query": [
+								{
+									"key": "language",
+									"value": "eng",
+									"description": "OCR language code (optional, default: eng)"
+								},
+								{
+									"key": "preprocess",
+									"value": "true",
+									"description": "Enable image preprocessing (optional, default: true)"
+								}
+							]
+						},
+						"description": "Upload an image file and automatically perform OCR to extract text. The endpoint always performs OCR by default."
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Image with OCR - Arabic",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "form-data",
+							"form-data": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/upload?language=ara&preprocess=true",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"upload"
+							],
+							"query": [
+								{
+									"key": "language",
+									"value": "ara",
+									"description": "OCR language for Arabic text"
+								},
+								{
+									"key": "preprocess",
+									"value": "true"
+								}
+							]
+						},
+						"description": "Upload image with Arabic OCR language"
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Image - Error: No File",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "form-data",
+							"form-data": []
+						},
+						"url": {
+							"raw": "{{base_url}}/api/upload",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"upload"
+							]
+						},
+						"description": "Test error handling when no file is uploaded"
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Image - Error: Invalid File Type",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "form-data",
+							"form-data": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": [],
+									"description": "Upload a PDF or non-image file to test validation"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/upload",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"upload"
+							]
+						},
+						"description": "Test error handling for invalid file types (only JPEG, PNG, WebP allowed)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Translation",
+			"item": [
+				{
+					"name": "Translate Text - English to Arabic",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"Hello, world!\",\n  \"targetLanguage\": \"ar\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/translate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"translate"
+							]
+						},
+						"description": "Translate text from English to Arabic. Source language is auto-detected."
+					},
+					"response": []
+				},
+				{
+					"name": "Translate Text - English to Spanish",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"Hello, world! This is a test.\",\n  \"targetLanguage\": \"es\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/translate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"translate"
+							]
+						},
+						"description": "Translate text to Spanish"
+					},
+					"response": []
+				},
+				{
+					"name": "Translate Text - With Source Language",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"Bonjour le monde!\",\n  \"sourceLanguage\": \"fr\",\n  \"targetLanguage\": \"en\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/translate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"translate"
+							]
+						},
+						"description": "Translate text with explicit source language specified"
+					},
+					"response": []
+				},
+				{
+					"name": "Translate Text - Error: Missing Text",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"targetLanguage\": \"ar\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/translate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"translate"
+							]
+						},
+						"description": "Test validation error when text is missing"
+					},
+					"response": []
+				},
+				{
+					"name": "Translate Text - Error: Missing Target Language",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"Hello, world!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/translate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"translate"
+							]
+						},
+						"description": "Test validation error when target language is missing"
+					},
+					"response": []
+				},
+				{
+					"name": "Translate Text - Error: Invalid Language",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"Hello, world!\",\n  \"targetLanguage\": \"xyz\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/translate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"translate"
+							]
+						},
+						"description": "Test validation error for unsupported language code"
+					},
+					"response": []
+				},
+				{
+					"name": "Translate Text - Long Text",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"This is a longer text to test translation of multiple sentences. It contains several paragraphs and should be translated correctly. The translation service should handle longer texts without issues.\",\n  \"targetLanguage\": \"fr\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/translate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"translate"
+							]
+						},
+						"description": "Test translation of longer text"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "OCR to Translation Pipeline",
+			"item": [
+				{
+					"name": "Complete Pipeline - OCR then Translate",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// This is a manual workflow example",
+									"// Step 1: Upload image and get OCR text",
+									"// Step 2: Use the extracted text in translation request",
+									"",
+									"// Note: In Postman, you would need to:",
+									"// 1. Run the 'Upload Image with OCR' request first",
+									"// 2. Copy the 'text' field from the response",
+									"// 3. Use it in the translation request"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"{{ocr_extracted_text}}\",\n  \"targetLanguage\": \"ar\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/translate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"translate"
+							]
+						},
+						"description": "Example of using OCR extracted text for translation. Replace {{ocr_extracted_text}} with text from OCR response."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "ocr_extracted_text",
+			"value": "",
+			"type": "string",
+			"description": "Extracted text from OCR response (set manually after OCR request)"
+		}
+	]
+}
