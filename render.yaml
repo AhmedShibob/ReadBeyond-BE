@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: readbeyond-api
+    env: node
+    plan: free  # Change to 'starter' or 'standard' for production
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # PORT is automatically set by Render, no need to specify
+      - key: OCR_WORKER_THREADS
+        value: 2
+      - key: OCR_TIMEOUT_MS
+        value: 30000
+      - key: IMAGE_PREPROCESSING_ENABLED
+        value: true
+      - key: TRANSLATION_PROVIDER
+        value: mymemory
+      - key: TRANSLATION_TIMEOUT_MS
+        value: 15000
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 1800000  # 30 minutes
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: 20
+      - key: LOG_LEVEL
+        value: info
+    healthCheckPath: /health

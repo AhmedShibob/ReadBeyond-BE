@@ -395,6 +395,85 @@ The `docker-compose.yml` file includes:
 
 ---
 
+## ☁️ Render Deployment
+
+ReadBeyond is ready to deploy on [Render](https://render.com) with zero configuration changes.
+
+### Quick Deploy
+
+1. **Connect your repository**
+   - Go to [Render Dashboard](https://dashboard.render.com)
+   - Click "New +" → "Web Service"
+   - Connect your GitHub/GitLab repository
+
+2. **Configure the service**
+   - **Name**: `readbeyond-api` (or your preferred name)
+   - **Environment**: `Node`
+   - **Build Command**: `npm install` (or leave empty, Render auto-detects)
+   - **Start Command**: `npm start`
+   - **Plan**: Choose `Free` for testing or `Starter`/`Standard` for production
+
+3. **Set Environment Variables**
+   Add these in the Render dashboard under "Environment":
+   ```
+   NODE_ENV=production
+   PORT=10000
+   OCR_WORKER_THREADS=2
+   OCR_TIMEOUT_MS=30000
+   IMAGE_PREPROCESSING_ENABLED=true
+   TRANSLATION_PROVIDER=mymemory
+   TRANSLATION_TIMEOUT_MS=15000
+   RATE_LIMIT_WINDOW_MS=1800000
+   RATE_LIMIT_MAX_REQUESTS=20
+   LOG_LEVEL=info
+   ```
+
+4. **Deploy**
+   - Click "Create Web Service"
+   - Render will automatically build and deploy your app
+   - Your API will be available at `https://your-app-name.onrender.com`
+
+### Using render.yaml (Recommended)
+
+If you have `render.yaml` in your repository, Render will automatically detect and use it:
+
+1. Push your code to GitHub/GitLab
+2. In Render dashboard, select "New +" → "Blueprint"
+3. Connect your repository
+4. Render will automatically configure everything from `render.yaml`
+
+### Health Check
+
+Render will automatically monitor your service using the `/health` endpoint. Make sure it returns `200 OK`.
+
+### Important Notes for Render
+
+- **Free Tier Limitations**:
+  - Services spin down after 15 minutes of inactivity
+  - First request after spin-down may take 30-60 seconds
+  - Consider upgrading to `Starter` plan for production
+
+- **Memory Considerations**:
+  - OCR processing is memory-intensive
+  - Free tier has 512MB RAM (may be tight for large images)
+  - Consider `Starter` plan (512MB-2GB) or `Standard` plan (2GB+) for production
+
+- **Worker Threads**:
+  - On free tier, set `OCR_WORKER_THREADS=1` to reduce memory usage
+  - On paid tiers, you can use `OCR_WORKER_THREADS=2` or more
+
+- **Environment Variables**:
+  - All sensitive configuration should be set in Render dashboard
+  - Never commit `.env` file to repository
+
+### Custom Domain
+
+1. Go to your service settings in Render
+2. Click "Custom Domains"
+3. Add your domain and follow DNS configuration instructions
+
+---
+
 ## 📁 Project Structure
 
 ```
