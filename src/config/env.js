@@ -9,8 +9,8 @@ const config = {
   OCR_WORKER_THREADS: parseInt(process.env.OCR_WORKER_THREADS) || 2,
   OCR_LANGUAGES: process.env.OCR_LANGUAGES || 'eng',
   IMAGE_PREPROCESSING_ENABLED: process.env.IMAGE_PREPROCESSING_ENABLED !== 'false',
-  RATE_LIMIT_WINDOW_MS: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
-  RATE_LIMIT_MAX_REQUESTS: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
+  RATE_LIMIT_WINDOW_MS: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 30 * 60 * 1000, // 30 minutes (0.5 hour)
+  RATE_LIMIT_MAX_REQUESTS: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 20,
   // Translation configuration
   // Using MyMemory Translation API (free, no API key required)
   // Alternative: Set TRANSLATION_PROVIDER=libretranslate to use LibreTranslate (requires self-hosting or paid plan)

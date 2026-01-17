@@ -31,17 +31,26 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Rate limiting
+// Rate limiting - 20 requests per 30 minutes per IP
 const limiter = rateLimit({
-  windowMs: config.RATE_LIMIT_WINDOW_MS,
-  max: config.RATE_LIMIT_MAX_REQUESTS,
+  windowMs: config.RATE_LIMIT_WINDOW_MS, // 30 minutes (0.5 hour)
+  max: config.RATE_LIMIT_MAX_REQUESTS, // 20 requests
+  // Identify users by IP address
+  keyGenerator: (req) => {
+    // Get IP from request (works with trust proxy)
+    return req.ip || req.connection.remoteAddress || 'unknown';
+  },
   message: {
     error: {
-      message: 'Too many requests from this IP, please try again later.',
+      message: 'Rate limit exceeded. Maximum 20 requests per 30 minutes per IP address. Please try again later.',
     },
   },
-  standardHeaders: true,
-  legacyHeaders: false,
+  standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
+  legacyHeaders: false, // Disable `X-RateLimit-*` headers
+  // Skip successful requests (only count failed requests) - set to false to count all requests
+  skipSuccessfulRequests: false,
+  // Skip failed requests (only count successful requests) - set to false to count all requests
+  skipFailedRequests: false,
 });
 app.use('/api/', limiter);
 
