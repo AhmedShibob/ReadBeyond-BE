@@ -9,6 +9,7 @@ const config = {
   OCR_WORKER_THREADS: parseInt(process.env.OCR_WORKER_THREADS) || 2,
   OCR_LANGUAGES: process.env.OCR_LANGUAGES || 'eng',
   IMAGE_PREPROCESSING_ENABLED: process.env.IMAGE_PREPROCESSING_ENABLED !== 'false',
+  OCR_FAST_MODE: process.env.OCR_FAST_MODE === 'true', // Aggressive optimizations for speed
   RATE_LIMIT_WINDOW_MS: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 30 * 60 * 1000, // 30 minutes (0.5 hour)
   RATE_LIMIT_MAX_REQUESTS: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 20,
   // Translation configuration

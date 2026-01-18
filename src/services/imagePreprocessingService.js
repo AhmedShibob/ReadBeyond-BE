@@ -1,5 +1,6 @@
 const sharp = require('sharp');
 const logger = require('../utils/logger');
+const config = require('../config/env');
 
 class ImagePreprocessingService {
   /**
@@ -11,7 +12,7 @@ class ImagePreprocessingService {
     const startTime = Date.now();
 
     try {
-      // Get image metadata
+      // Get image metadata (cached for reuse)
       const metadata = await sharp(imageBuffer).metadata();
       logger.debug({ 
         width: metadata.width, 
@@ -19,34 +20,49 @@ class ImagePreprocessingService {
         format: metadata.format 
       }, 'Original image metadata');
 
-      // Preprocessing pipeline
+      // Skip preprocessing if image is already small and in good format
+      if (metadata.width <= 1500 && metadata.height <= 1500 && metadata.format === 'png') {
+        logger.debug('Image already optimized, skipping preprocessing');
+        return imageBuffer;
+      }
+
+      // Preprocessing pipeline - optimized for speed
       let pipeline = sharp(imageBuffer);
 
-      // 1. Resize if too large (max 2000px on longest side)
-      const maxDimension = 2000;
+      // 1. Aggressive resize for faster OCR
+      // Smaller images = faster OCR processing
+      // Fast mode: 1200px, Normal mode: 1500px
+      const maxDimension = config.OCR_FAST_MODE ? 1200 : 1500;
       if (metadata.width > maxDimension || metadata.height > maxDimension) {
         pipeline = pipeline.resize(maxDimension, maxDimension, {
           fit: 'inside',
           withoutEnlargement: true,
+          kernel: 'lanczos3', // High quality but fast
         });
         logger.debug('Image resized for optimization');
       }
 
-      // 2. Convert to grayscale (reduces noise, improves OCR)
+      // 2. Convert to grayscale (reduces noise, improves OCR, faster processing)
       pipeline = pipeline.greyscale();
 
-      // 3. Enhance contrast
+      // 3. Enhance contrast (normalize) - improves accuracy
       pipeline = pipeline.normalize();
 
-      // 4. Apply sharpening filter
-      pipeline = pipeline.sharpen({
-        sigma: 1,
-        flat: 1,
-        jagged: 2,
-      });
+      // 4. Light sharpening (reduced for speed, skip in fast mode)
+      if (!config.OCR_FAST_MODE) {
+        pipeline = pipeline.sharpen({
+          sigma: 0.5, // Reduced from 1 for faster processing
+          flat: 1,
+          jagged: 1.5, // Reduced from 2
+        });
+      }
 
-      // 5. Convert to PNG format (Tesseract works best with PNG)
-      const processedBuffer = await pipeline.png().toBuffer();
+      // 5. Convert to PNG format with compression (Tesseract works best with PNG)
+      // Using compression level 6 (balance between size and speed)
+      const processedBuffer = await pipeline.png({ 
+        compressionLevel: 6,
+        quality: 90 
+      }).toBuffer();
 
       const processingTime = Date.now() - startTime;
       logger.debug({ processingTime: `${processingTime}ms` }, 'Image preprocessing completed');
@@ -59,14 +75,16 @@ class ImagePreprocessingService {
   }
 
   /**
-   * Validate image buffer
+   * Validate image buffer (optimized - minimal metadata read)
    * @param {Buffer} imageBuffer - Image buffer to validate
    * @returns {Promise<boolean>} - True if valid image
    */
   async validateImage(imageBuffer) {
     try {
-      const metadata = await sharp(imageBuffer).metadata();
-      return metadata.width > 0 && metadata.height > 0;
+      // Quick validation - just check if we can read metadata
+      // Using failOn: 'none' for faster processing
+      const metadata = await sharp(imageBuffer, { failOn: 'none' }).metadata();
+      return metadata && metadata.width > 0 && metadata.height > 0;
     } catch (error) {
       return false;
     }

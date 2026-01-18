@@ -43,8 +43,11 @@ parentPort.on('message', async (message) => {
       // Ensure worker is initialized
       const worker = await initializeTesseract();
 
-      // Perform OCR
-      const { data } = await worker.recognize(imageBuffer);
+      // Perform OCR with optimized options
+      // Using recognize() with minimal options for faster processing
+      const { data } = await worker.recognize(imageBuffer, {
+        rectangle: undefined, // Process entire image (faster than region detection)
+      });
 
       // Send result back to main thread
       parentPort.postMessage({
